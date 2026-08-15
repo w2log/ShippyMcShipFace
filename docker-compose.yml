@@ -1,11 +1,8 @@
-# ThermalDeck — Synology Container Manager → Project (not Image import)
+# ThermalDeck — Synology Container Manager → Project
 #
-# Synology's "Add image from URL" cannot use ghcr.io. Create a Project instead;
-# Docker pulls GHCR fine that way.
-#
-# Folder on NAS, e.g. /volume1/docker/thermaldeck/
-#   docker-compose.yml  (this file)
-#   data/               (empty folder; chown 1001:1001)
+# Folder: /volume1/docker/thermaldeck/
+#   docker-compose.yml
+#   data/
 #
 # UI: http://<nas-ip>:8080
 
@@ -14,10 +11,15 @@ services:
     image: ghcr.io/w2log/thermaldeck:latest
     container_name: thermaldeck
     restart: unless-stopped
-    network_mode: host
+    # Bridge + publish is more reliable on Synology than host networking.
+    # The container can still reach LAN printers (e.g. 172.16.x.x).
+    ports:
+      - "8080:8080"
     environment:
       PORT: "3001"
       DATA_DIR: /app/data
       # API_SECRET: "change-me"
     volumes:
       - ./data:/app/data
+    # Ensure bind-mount writes work regardless of folder owner
+    user: "0:0"

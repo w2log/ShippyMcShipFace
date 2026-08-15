@@ -36,8 +36,9 @@ FROM caddy:2.9-alpine AS caddy
 # ─── Runtime ──────────────────────────────────────────────────────
 FROM node:20-alpine AS runtime
 
-RUN apk add --no-cache ca-certificates \
-  && adduser -D -u 1001 -h /app thermaldeck
+# ca-certificates: HTTPS status checks to the printer web UI
+# tini: proper PID 1 / signal handling on Synology
+RUN apk add --no-cache ca-certificates tini
 
 COPY --from=caddy /usr/bin/caddy /usr/bin/caddy
 
@@ -52,20 +53,21 @@ COPY --from=build /app/frontend/dist ./frontend/dist
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY start.sh /app/start.sh
 
-RUN chmod +x /app/start.sh \
-  && mkdir -p /app/data \
-  && chown -R thermaldeck:thermaldeck /app
+# Root is intentional for Synology bind mounts (UID mismatches kill the app silently).
+# This is a LAN home-NAS appliance, not a multi-tenant host.
+RUN chmod +x /app/start.sh && mkdir -p /app/data
 
 ENV NODE_ENV=production \
     PORT=3001 \
-    DATA_DIR=/app/data
+    DATA_DIR=/app/data \
+    XDG_CONFIG_HOME=/app/data/caddy-config \
+    XDG_DATA_HOME=/app/data/caddy-data
 
 EXPOSE 8080
 VOLUME ["/app/data"]
 
-USER thermaldeck
-
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
+ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["/app/start.sh"]
