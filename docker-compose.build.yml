@@ -1,0 +1,14 @@
+# Local / NAS build (when you are not pulling from GHCR)
+
+services:
+  thermaldeck:
+    build: .
+    image: thermaldeck:latest
+    container_name: thermaldeck
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      PORT: "3001"
+      DATA_DIR: /app/data
+    volumes:
+      - ./data:/app/data

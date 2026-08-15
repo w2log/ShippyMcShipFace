@@ -1,0 +1,26 @@
+{
+	admin off
+}
+
+:8080 {
+	encode gzip
+
+	handle /health {
+		reverse_proxy 127.0.0.1:3001
+	}
+
+	handle /api/* {
+		reverse_proxy 127.0.0.1:3001
+	}
+
+	handle {
+		root * /app/frontend/dist
+		try_files {path} /index.html
+		file_server
+	}
+
+	@static {
+		path *.js *.css *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2
+	}
+	header @static Cache-Control "public, max-age=31536000, immutable"
+}

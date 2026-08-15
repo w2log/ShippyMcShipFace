@@ -1,0 +1,18 @@
+# Build context exclusions
+**/node_modules
+**/dist
+**/*.log
+**/.env
+**/.env.*
+.git
+.gitignore
+.claude
+.cursor
+PLANNING.md
+*.md
+docker-compose*.yml
+.env*
+start.ps1
+backend/data
+data
+.github

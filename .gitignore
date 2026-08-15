@@ -1,0 +1,34 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+
+# Backend data
+backend/data/
+
+# Docker / Synology runtime data
+data/*
+!data/.gitkeep
+
+# Frontend
+frontend/.env.local
+frontend/*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+frontend/tailwind.config.js
+frontend/tailwind.config.d.ts
+
+# Local tooling
+.claude/
+.cursor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

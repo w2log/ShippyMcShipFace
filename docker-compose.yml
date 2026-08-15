@@ -1,0 +1,22 @@
+# ThermalDeck — Synology via GitHub Container Registry
+#
+# After the first successful GitHub Actions build:
+#   1. Set GHCR_OWNER below (your GitHub username, lowercase)
+#   2. Copy only this file + create a data/ folder on the NAS
+#   3. Container Manager → Project → use this compose → Start
+#
+# Image: ghcr.io/<owner>/thermaldeck:latest
+# UI:    http://<nas-ip>:8080
+
+services:
+  thermaldeck:
+    image: ghcr.io/${GHCR_OWNER}/thermaldeck:latest
+    container_name: thermaldeck
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      PORT: "3001"
+      DATA_DIR: /app/data
+      # API_SECRET: "change-me"
+    volumes:
+      - ./data:/app/data
